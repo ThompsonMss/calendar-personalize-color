@@ -15,7 +15,7 @@ export default function getDaysMonth(
     setLastDayCurrent,
     setMonthCurrent,
     setYearCurrent,
-    umcaraai,
+    dates,
     changeDate
 ) {
 
@@ -42,7 +42,9 @@ export default function getDaysMonth(
         for (let i = 1; i <= diferencaDiaAnterior; i++) {
             const dataAux = subDays(startDayMonth, i);
             diasMesAnterior.unshift([dataAux, {
-                value: false
+                value: false,
+                passado: true,
+                futuro: false
             }]);
         }
     }
@@ -51,8 +53,10 @@ export default function getDaysMonth(
     const daysCurrent = [];
     for (let j = 0; j < numberDaysMonth; j++) {
         daysCurrent.push([addDays(startDayMonth, j), {
-            value: true,
-            badge: true
+            value: false,
+            passado: false,
+            futuro: false
+            // badge: true
         }]);
     }
 
@@ -63,8 +67,10 @@ export default function getDaysMonth(
         for (let i = 1; i <= diferencaDiaPosteriro; i++) {
             const dataAux = addDays(endDayMonth, i);
             diasMesPosteriro.push([dataAux, {
-                value: true,
-                badge: true
+                value: false,
+                passado: false,
+                futuro: true
+                // badge: true
             }]);
         }
     }
@@ -86,8 +92,10 @@ export default function getDaysMonth(
 
             const dataAux = addDays(ultimaDataPosterior, i);
             aux.push([dataAux, {
-                value: true,
-                badge: true
+                value: false,
+                passado: false,
+                futuro: true
+                // badge: true
             }]);
         }
 
@@ -107,7 +115,18 @@ export default function getDaysMonth(
         const aux = [];
 
         aux.push(day[0]);
-        aux.push(day[1])
+
+        const obj = day[1];
+       
+        if (dates !== undefined) {
+            const valueDate = dates[format(day[0], "yyyy-MM-dd")];
+            if (valueDate !== undefined) {
+                obj.value = valueDate;
+                obj.badge = true;
+            }
+        }
+
+        aux.push(obj)
 
         responseDaysMonth.push(aux);
     });

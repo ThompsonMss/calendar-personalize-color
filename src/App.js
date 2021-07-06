@@ -14,6 +14,11 @@ function App() {
       <Calendar
         onCheckDay={setDayCheck}
         alertBlock={() => alert('Essa data está bloqueada.')}
+        primaryColor="#000"
+        inversePrimaryColor="#FFF"
+        secondaryColor="#f39c12"
+        inverseSecondaryColor="#000"
+      // dates={{"2021-07-06": true, "2021-07-07": false}}
       />
     </div>
   );

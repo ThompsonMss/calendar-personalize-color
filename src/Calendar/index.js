@@ -25,9 +25,9 @@ const defaultProps = {
     inversePrimaryColor: "#FFF",
     secondaryColor: "#f39c12",
     inverseSecondaryColor: "#000",
-    dayCheck: "",
     onCheckDay: () => null,
-    alertBlock: () => null
+    alertBlock: () => null,
+    dates: undefined
 };
 
 export default function Calendar(props) {
@@ -50,17 +50,32 @@ export default function Calendar(props) {
             setLastDayCurrent,
             setMonthCurrent,
             setYearCurrent,
-            false,
+            props.dates,
             dayCurrent
         );
 
         setDays(transformDays(dias));
 
-    }, [dayCurrent]);
+    }, [dayCurrent, props.dates]);
 
     function handleCheck(date) {
         propsCalendar?.onCheckDay(date);
         setCheck(date);
+    }
+
+    function getDiaValido(dia) {
+
+        let response;
+
+        if (dia.passado) {
+            response = false;
+        } else if (dia.futuro) {
+            response = false;
+        } else {
+            response = dia.value;
+        }
+
+        return response;
     }
 
     function renderDay(dataDays, initial) {
@@ -69,7 +84,7 @@ export default function Calendar(props) {
 
         Object.keys(dataDays).map((dia, index) => {
             if (index >= initial && index < initial + 7) {
-                diasValidos[dia] = dataDays[dia].value;
+                diasValidos[dia] = dataDays[dia];
             }
         });
 
@@ -77,10 +92,10 @@ export default function Calendar(props) {
             <ColumnDay>
                 {Object.keys(diasValidos).map((dia) => (
                     <WrapperDay
-                        disabled={!dataDays[dia].value}
+                        disabled={!getDiaValido(dataDays[dia])}
                         propsCalendar={propsCalendar}
                         onClick={() => {
-                            if (dataDays[dia].value) {
+                            if (getDiaValido(dataDays[dia])) {
                                 handleCheck(dia)
                             } else {
                                 propsCalendar?.alertBlock()
@@ -90,7 +105,7 @@ export default function Calendar(props) {
                         <Check
                             propsCalendar={propsCalendar}
                             check={check == dia ? true : false}
-                            disabled={!dataDays[dia].value}
+                            disabled={!getDiaValido(dataDays[dia])}
                             colorOff={isAfter(parseISO(dia), lastDayCurrent)}
                         >
                             <span>{format(parseISO(dia), "dd")}</span>
