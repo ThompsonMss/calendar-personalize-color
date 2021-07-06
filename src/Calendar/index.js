@@ -11,112 +11,167 @@ import {
     Badge
 } from './styles';
 
-import days from './days';
+import weeks from './weeks';
+import monthName from './month';
+import transformDays from './transformDays';
+import getDaysMonth from './getDaysMonth';
 
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
-
+import { format, parseISO, isAfter, addMonths, subMonths } from 'date-fns';
+import { pt } from 'date-fns/locale/pt';
 
 const defaultProps = {
     primaryColor: "#000",
     inversePrimaryColor: "#FFF",
     secondaryColor: "#f39c12",
-    inverseSecondaryColor: "#000"
+    inverseSecondaryColor: "#000",
+    dayCheck: "",
+    onCheckDay: () => null,
+    alertBlock: () => null
 };
 
 export default function Calendar(props) {
 
-    const propsCalendar = { ...defaultProps };
+    const propsCalendar = { ...defaultProps, ...props };
 
-    const dias = [
-        ["29",
-            "30",
-            "01",
-            "02",
-            "03",
-            "04",
-            "05"],
-        ["06",
-            "07",
-            "08",
-            "09",
-            "10",
-            "11",
-            "12"],
-        ["13",
-            "14",
-            "15",
-            "16",
-            "17",
-            "18",
-            "19"],
-        ["20",
-            "21",
-            "22",
-            "23",
-            "24",
-            "25",
-            "26"],
-        ["27",
-            "28",
-            "29",
-            "30",
-            "01",
-            "02",
-            "03"]
-    ];
+    const [check, setCheck] = React.useState("");
+
+    const [disableBackCalendar, setDisableBackCalendar] = React.useState(true);
+
+    const [lastDayCurrent, setLastDayCurrent] = React.useState("");
+    const [yearCurrent, setYearCurrent] = React.useState(2021);
+    const [monthCurrent, setMonthCurrent] = React.useState(1);
+    const [dayCurrent, setDayCurrent] = React.useState(new Date());
+    const [days, setDays] = React.useState(null);
+
+    React.useEffect(() => {
+
+        const dias = getDaysMonth(
+            setLastDayCurrent,
+            setMonthCurrent,
+            setYearCurrent,
+            false,
+            dayCurrent
+        );
+
+        setDays(transformDays(dias));
+
+    }, [dayCurrent]);
+
+    function handleCheck(date) {
+        propsCalendar?.onCheckDay(date);
+        setCheck(date);
+    }
+
+    function renderDay(dataDays, initial) {
+
+        const diasValidos = {};
+
+        Object.keys(dataDays).map((dia, index) => {
+            if (index >= initial && index < initial + 7) {
+                diasValidos[dia] = dataDays[dia].value;
+            }
+        });
+
+        return (
+            <ColumnDay>
+                {Object.keys(diasValidos).map((dia) => (
+                    <WrapperDay
+                        disabled={!dataDays[dia].value}
+                        propsCalendar={propsCalendar}
+                        onClick={() => {
+                            if (dataDays[dia].value) {
+                                handleCheck(dia)
+                            } else {
+                                propsCalendar?.alertBlock()
+                            }
+                        }}
+                    >
+                        <Check
+                            propsCalendar={propsCalendar}
+                            check={check == dia ? true : false}
+                            disabled={!dataDays[dia].value}
+                            colorOff={isAfter(parseISO(dia), lastDayCurrent)}
+                        >
+                            <span>{format(parseISO(dia), "dd")}</span>
+                            {dataDays[dia]?.badge && (
+                                <Badge
+                                    show={true}
+                                    color={dataDays[dia].value ? '#27ae60' : 'red'}
+                                />
+                            )}
+                        </Check>
+
+                    </WrapperDay>
+
+                ))}
+            </ColumnDay>
+        )
+    }
+
+    function changeMonth(opt) {
+        if (opt == '+') {
+            const addDate = addMonths(dayCurrent, 1);
+            setDayCurrent(addDate)
+            setDisableBackCalendar(false);
+        } else {
+
+            const subDate = subMonths(dayCurrent, 1);
+            setDayCurrent(subDate)
+
+            const year = format(subDate, "yyyy");
+            const month = format(subDate, "MM");
+
+            const yearNow = format(new Date(), "yyyy");
+            const monthNow = format(new Date(), "MM");
+
+            if (year === yearNow && month === monthNow) {
+                setDisableBackCalendar(true);
+            }
+        }
+    }
 
     return (
         <Container propsCalendar={propsCalendar}>
 
             <Actions propsCalendar={propsCalendar}>
-                <button style={{ justifyContent: "flex-start" }} >
-                    <FaAngleLeft />
+                <button onClick={() => {
+                    if (!disableBackCalendar) {
+                        changeMonth('-')
+                    }
+                }} style={{ justifyContent: "flex-start", color: disableBackCalendar ? "#666" : null }} >
+                    <FaAngleLeft style={{ color: disableBackCalendar ? "#666" : null }} />
                 </button>
 
                 <div>
-                    <span>Julho, 2021</span>
+                    <span>{monthName[monthCurrent - 1]}, {yearCurrent}</span>
                 </div>
 
-                <button style={{ justifyContent: "flex-end" }} >
+                <button onClick={() => changeMonth('+')} style={{ justifyContent: "flex-end" }} >
                     <FaAngleRight />
                 </button>
             </Actions>
 
             <ContainerDays propsCalendar={propsCalendar}>
                 <ContentLabelsDays propsCalendar={propsCalendar}>
-                    {days.map(day => (
+                    {weeks.map(week => (
                         <div>
-                            <span>{day.label}</span>
+                            <span>{week.label}</span>
                         </div>
                     ))}
                 </ContentLabelsDays>
 
                 <ContentDays>
-                    {dias.map((dia) => (
-                        <ColumnDay>
-                            {dia.map((item, index) => (
-                                <WrapperDay
-                                    disabled={index == 6 && true}
-                                    propsCalendar={propsCalendar}
-                                >
-                                    <Check
-                                        propsCalendar={propsCalendar}
-                                        check={index == 4 && true}
-                                        disabled={index == 2 && true}
-                                    >
-                                        <span>{item}</span>
-                                        {/* {index == 6 && ( */}
-                                        <Badge
-                                            show={true}
-                                            color="red"
-                                        />
-                                        {/* )} */}
-                                    </Check>
-
-                                </WrapperDay>
-                            ))}
-                        </ColumnDay>
-                    ))}
+                    {days !== null && (
+                        <>
+                            {renderDay(days, 0)}
+                            {renderDay(days, 7)}
+                            {renderDay(days, 14)}
+                            {renderDay(days, 21)}
+                            {renderDay(days, 28)}
+                            {renderDay(days, 35)}
+                        </>
+                    )}
                 </ContentDays>
             </ContainerDays>
 

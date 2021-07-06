@@ -125,7 +125,7 @@ export const WrapperDay = styled.div`
         align-items: center;
         justify-content: center;
         width: 50px;
-        height: 50px;
+        height: 40px;
 
         @media(min-width: 769px){
             width: 50px;
@@ -149,7 +149,7 @@ export const Check = styled.div`
             font-size: 14px;
             text-transform: uppercase;
 
-            color: ${({ propsCalendar, disabled, check }) => disabled ? '#666' : check ? propsCalendar.inverseSecondaryColor : propsCalendar.inversePrimaryColor};
+            color: ${({ colorOff, propsCalendar, disabled, check }) => disabled ? '#666' : colorOff ? '#666' : check ? propsCalendar.inverseSecondaryColor : propsCalendar.inversePrimaryColor};
         }
 `;
 
@@ -157,7 +157,7 @@ export const Badge = styled.div`
     height: 4px;
     width: 4px;
     border-radius: 50px;
-    background: red;
+    background: ${props => props.color};
     position: absolute;
     bottom: 4px
 `;
