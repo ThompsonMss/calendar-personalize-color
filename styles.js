@@ -16,7 +16,7 @@ export const Container = styled.div`
 `;
 
 export const Actions = styled.div`
-    width: calc(100% - 20px);
+    width: 100%;
     height: 50px;
     display: flex;
     flex-direction: row;
@@ -71,7 +71,7 @@ export const ContainerDays = styled.div`
 
 export const ContentLabelsDays = styled.div`
 
-    width: calc(100% - 20px);
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -91,7 +91,7 @@ export const ContentLabelsDays = styled.div`
 
         span {
 
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             text-transform: uppercase;
 
@@ -110,7 +110,7 @@ export const ColumnDay = styled.div`
 `;
 
 export const ContentDays = styled.div`
-    width: calc(100% - 20px);
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -125,7 +125,8 @@ export const WrapperDay = styled.div`
         align-items: center;
         justify-content: center;
         width: 50px;
-        height: 40px;
+        height: 35px;
+        cursor: pointer;
 
         @media(min-width: 769px){
             width: 50px;

@@ -59,7 +59,7 @@ export default function Calendar(props) {
     }, [dayCurrent, props.dates]);
 
     function handleCheck(date) {
-        propsCalendar?.onCheckDay(date);
+        propsCalendar.onCheckDay(date);
         setCheck(date);
     }
 
@@ -98,7 +98,7 @@ export default function Calendar(props) {
                             if (getDiaValido(dataDays[dia])) {
                                 handleCheck(dia)
                             } else {
-                                propsCalendar?.alertBlock()
+                                propsCalendar.alertBlock()
                             }
                         }}
                     >
@@ -109,7 +109,7 @@ export default function Calendar(props) {
                             colorOff={isAfter(parseISO(dia), lastDayCurrent)}
                         >
                             <span>{format(parseISO(dia), "dd")}</span>
-                            {dataDays[dia]?.badge && (
+                            {'badge' in dataDays[dia] && (
                                 <Badge
                                     show={true}
                                     color={dataDays[dia].value ? '#27ae60' : 'red'}
